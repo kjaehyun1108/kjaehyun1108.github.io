@@ -1,0 +1,12 @@
+{
+  "products": [
+    { "name": "친환경 텀블러", "category": "reusable" },
+    { "name": "업사이클링 파우치", "category": "upcycled" },
+    { "name": "로컬푸드", "category": "local_food" },
+    { "name": "재생용지 노트", "category": "recycled" }
+  ],
+  "companies": [
+    { "name": "그린컴퍼니", "category": "eco_certified" },
+    { "name": "네이처프렌즈", "category": "b_corp" }
+  ]
+}

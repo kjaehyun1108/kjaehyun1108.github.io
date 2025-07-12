@@ -1,0 +1,14 @@
+{
+  "user1": {
+    "password": "pass1",
+    "name": "김그린"
+  },
+  "user2": {
+    "password": "pass2",
+    "name": "박에코"
+  },
+  "banana": {
+    "name": "김재현",
+    "password": "#jhjk32143214"
+  }
+}
