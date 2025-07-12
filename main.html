@@ -12,7 +12,7 @@
 </head>
 <body>
     <header class="app-header">
-        <div class="logo">Terra</div>
+        <div class="logo">GreenBag</div>
         <div class="user-profile">
             <div class="points">GP <span id="points-display">0</span></div>
             <button id="logout-button" class="logout-button">Log Out</button>
@@ -25,7 +25,7 @@
             <button class="nav-button" onclick="showView('transactions')">Activity</button>
             <button class="nav-button" onclick="showView('shop')">Redeem</button>
             <button class="nav-button" onclick="showView('tips')">Tips</button>
-            <button class="nav-button" onclick="startScanner()">Scan QR</button>
+            <button class="nav-button" onclick="showView('qr-scanner')">Scan QR</button>
         </nav>
 
         <div id="dashboard-view" class="app-view active">
@@ -48,6 +48,10 @@
         <div id="tips-view" class="app-view list-view card">
             <h2>Sustainability Tips</h2>
             <ul id="tips-list"></ul>
+        </div>
+
+        <div id="qr-scanner-view" class="app-view card" style="height: 80vh;">
+            <iframe src="https://f331e229-de25-47cb-9840-789850a5992e-00-1u3woucvj9zby.pike.replit.dev" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
 
         <div id="scanner-view" class="app-view card">
