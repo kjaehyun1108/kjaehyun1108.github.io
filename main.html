@@ -1,85 +1,65 @@
+
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나의 초록 나무</title>
+    <title>Dashboard - Terra</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>나의 초록 나무</h1>
-        <div class="points">
-            <span>그린 포인트:</span>
-            <span id="points-display">0</span>P
+    <header class="app-header">
+        <div class="logo">Terra</div>
+        <div class="user-profile">
+            <div class="points">GP <span id="points-display">0</span></div>
+            <button id="logout-button" class="logout-button">Log Out</button>
         </div>
     </header>
 
-    <main>
-        <section class="tree-container">
-            <canvas id="tree-canvas" width="300" height="400"></canvas>
-            <p>포인트를 모아 나무를 키워보세요!</p>
-        </section>
-
-        <nav class="menu">
-            <button onclick="showView('dashboard')">대시보드</button>
-            <button onclick="showView('transactions')">소비 내역</button>
-            <button onclick="showView('shop')">포인트 교환소</button>
-            <button onclick="showView('tips')">지속가능 팁</button>
-            <button onclick="startScanner()">QR 스캔</button> <!-- QR 스캔 버튼 추가 -->
+    <main class="app-main">
+        <nav class="app-nav">
+            <button class="nav-button active" onclick="showView('dashboard')">Dashboard</button>
+            <button class="nav-button" onclick="showView('transactions')">Activity</button>
+            <button class="nav-button" onclick="showView('shop')">Redeem</button>
+            <button class="nav-button" onclick="showView('tips')">Tips</button>
+            <button class="nav-button" onclick="startScanner()">Scan QR</button>
         </nav>
 
-        <div id="scanner-view" class="view"> <!-- 스캐너 뷰 추가 -->
-            <h2>QR 코드 스캔</h2>
-            <p>아래 영역에 QR 코드를 비춰주세요.</p>
-            <div id="qr-reader"></div>
-            <button onclick="stopScanner()" class="button-secondary">스캔 중지</button>
-        </div>
-
-        <div id="dashboard-view" class="view active">
-            <h2>대시보드</h2>
-            <p>현재 당신의 나무 상태입니다.</p>
-        </div>
-
-        <div id="transactions-view" class="view">
-            <h2>소비 내역</h2>
-            <ul id="transaction-list">
-                <!-- 샘플 데이터가 여기에 동적으로 추가됩니다. -->
-            </ul>
-        </div>
-
-        <div id="shop-view" class="view">
-            <h2>포인트 교환소</h2>
-            <div class="shop-items">
-                <div class="shop-item">
-                    <p>친환경 텀블러</p>
-                    <span>1,000P</span>
-                    <button>교환하기</button>
-                </div>
-                <div class="shop-item">
-                    <p>업사이클링 파우치</p>
-                    <span>1,500P</span>
-                    <button>교환하기</button>
-                </div>
-                 <div class="shop-item">
-                    <p>나무 한 그루 기부</p>
-                    <span>2,000P</span>
-                    <button>교환하기</button>
-                </div>
+        <div id="dashboard-view" class="app-view active">
+            <div class="tree-container-wrapper card">
+                 <canvas id="tree-canvas" width="300" height="400"></canvas>
+                 <p style="margin-top: 1rem; color: #666;">Your tree grows as you make sustainable choices.</p>
             </div>
         </div>
 
-        <div id="tips-view" class="view">
-            <h2>지속가능 팁</h2>
-            <ul id="tips-list">
-                <li data-points="1000">텀블러 사용하여 일회용 컵 줄이기 (+10P) <button onclick="practiceTip(this)">실천하기</button></li>
-                <li data-points="1500">장바구니 사용하여 비닐봉투 줄이기 (+15P) <button onclick="practiceTip(this)">실천하기</button></li>
-                <li data-points="2000">대중교통 이용하기 (+20P) <button onclick="practiceTip(this)">실천하기</button></li>
-            </ul>
+        <div id="transactions-view" class="app-view list-view card">
+            <h2>Activity Feed</h2>
+            <ul id="transaction-list"></ul>
+        </div>
+
+        <div id="shop-view" class="app-view">
+            <h2>Redeem Points</h2>
+            <div id="shop-items" class="shop-grid"></div>
+        </div>
+
+        <div id="tips-view" class="app-view list-view card">
+            <h2>Sustainability Tips</h2>
+            <ul id="tips-list"></ul>
+        </div>
+
+        <div id="scanner-view" class="app-view card">
+            <div id="qr-reader-container">
+                <h2>Scan a Product QR Code</h2>
+                <div id="qr-reader"></div>
+                <button onclick="stopScanner()" class="auth-button" style="width: 100%;">Cancel</button>
+            </div>
         </div>
     </main>
 
-    <div id="feedback-container"></div>
+    <div id="feedback-container" class="feedback-container"></div>
 
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <script src="app.js"></script>

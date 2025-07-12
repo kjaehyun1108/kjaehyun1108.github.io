@@ -1,23 +1,35 @@
+
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 - 나의 초록 나무</title>
+    <title>Sign In - Terra</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="login-container">
-        <h2>로그인</h2>
-        <form id="login-form">
-            <input type="text" id="username" placeholder="사용자 이름" required>
-            <input type="password" id="password" placeholder="비밀번호" required>
-            <button type="submit">로그인</button>
-        </form>
-        <p id="login-message"></p>
-        <p>계정이 없으신가요? <a href="signup.html">회원가입</a></p>
+    <div class="auth-container">
+        <div class="auth-form-wrapper">
+            <h1>Welcome Back</h1>
+            <p>Sign in to continue your journey with Terra.</p>
+            <form id="login-form" class="auth-form">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="input-field" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="input-field" required>
+                </div>
+                <button type="submit" class="auth-button">Sign In</button>
+            </form>
+            <p id="login-message" class="auth-message"></p>
+            <p class="auth-switch-link">Don't have an account? <a href="signup.html">Sign Up</a></p>
+        </div>
     </div>
-
     <script src="login.js"></script>
 </body>
 </html>
