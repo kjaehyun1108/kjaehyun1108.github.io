@@ -5,49 +5,88 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'index.html'; // 토큰 없으면 로그인 페이지로
         return;
     }
-
-    // TODO: 서버에 토큰 유효성 검증 요청 (보안 강화)
-    // 여기서는 간단히 토큰 존재 여부만 확인합니다.
 });
 
+// --- DOM 요소 ---
 const pointsDisplay = document.getElementById('points-display');
+const waterDisplay = document.getElementById('water-display');
+const waterTreeButton = document.getElementById('water-tree-button');
 const treeCanvas = document.getElementById('tree-canvas');
 const ctx = treeCanvas.getContext('2d');
 
+// --- 상태 변수 ---
 let currentPoints = 0;
+let currentWater = 0;
+let treeGrowthLevel = 0;
+let redeemedCoupons = [];
+let sampleTransactions = [];
 
-// --- 초기 나무 그리기 (고급, 프랙탈) ---
+// --- 상태 저장 및 불러오기 (localStorage) ---
+function saveState() {
+    const appState = {
+        currentPoints,
+        currentWater,
+        treeGrowthLevel,
+        redeemedCoupons,
+        sampleTransactions
+    };
+    localStorage.setItem('greenTreeAppState', JSON.stringify(appState));
+}
+
+function loadState() {
+    const savedState = localStorage.getItem('greenTreeAppState');
+    if (savedState) {
+        const appState = JSON.parse(savedState);
+        currentPoints = appState.currentPoints || 0;
+        currentWater = appState.currentWater || 0;
+        treeGrowthLevel = appState.treeGrowthLevel || 0;
+        redeemedCoupons = appState.redeemedCoupons || [];
+        sampleTransactions = appState.sampleTransactions || [];
+    } else {
+        // 기본값 설정 (첫 방문 시)
+        sampleTransactions = [
+            { item: 'Cafe Latte (Tumbler Discount)', points: 10 },
+            { item: 'Local grocery shopping (used bag)', points: 15 },
+            { item: 'Bus fare', points: 5 },
+            { item: 'Upcycled notebook purchase', points: 25 },
+        ];
+    }
+}
+
+// --- 나무 그리기 (프랙탈) ---
 function drawTree(growth) {
     ctx.clearRect(0, 0, treeCanvas.width, treeCanvas.height);
-
-    // 하늘 그라데이션
     const sky = ctx.createLinearGradient(0, 0, 0, treeCanvas.height);
-    sky.addColorStop(0, '#e6f7ff'); // 밝은 하늘색
-    sky.addColorStop(1, '#ffffff'); // 흰색
+    sky.addColorStop(0, '#e6f7ff');
+    sky.addColorStop(1, '#ffffff');
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, treeCanvas.width, treeCanvas.height);
-
-    // 땅
-    ctx.fillStyle = '#a58e7c'; // 부드러운 흙색
+    ctx.fillStyle = '#a58e7c';
     ctx.fillRect(0, 380, 300, 20);
+
+    if (growth >= 1000) {
+        const img = new Image();
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0, treeCanvas.width, treeCanvas.height);
+        }
+        img.src = 'tree_end.png';
+        return; // 다 자란 나무 이미지를 표시하고 프랙탈 그리기는 생략
+    }
 
     const startX = treeCanvas.width / 2;
     const startY = 380;
-    const len = 60 + growth * 1.5;
-    const angle = 0; // 수정: 초기 각도를 0으로 설정하여 나무가 바로 서 있도록 합니다.
-    const branchWidth = 8 + growth / 10;
-    const maxDepth = Math.min(Math.floor(growth / 10) + 1, 7); // 성장에 따라 최대 깊이 증가, 최대 7
+    const len = 60 + growth * 0.15;
+    const branchWidth = 8 + growth / 100;
+    const maxDepth = Math.min(Math.floor(growth / 100) + 1, 7);
 
-    drawBranch(startX, startY, len, angle, branchWidth, 0, maxDepth);
+    drawBranch(startX, startY, len, 0, branchWidth, 0, maxDepth);
 }
 
 function drawBranch(startX, startY, len, angle, branchWidth, currentDepth, maxDepth) {
     if (currentDepth > maxDepth || len < 5) return;
-
     ctx.beginPath();
     ctx.save();
-
-    ctx.strokeStyle = '#593c1f'; // 고동색
+    ctx.strokeStyle = '#593c1f';
     ctx.lineWidth = branchWidth;
     ctx.lineCap = 'round';
     ctx.translate(startX, startY);
@@ -56,87 +95,81 @@ function drawBranch(startX, startY, len, angle, branchWidth, currentDepth, maxDe
     ctx.lineTo(0, -len);
     ctx.stroke();
 
-    const newLen = len * (0.75 + Math.random() * 0.1); // 75-85% 길이
+    const newLen = len * (0.75 + Math.random() * 0.1);
     const newBranchWidth = branchWidth * 0.7;
+    drawBranch(0, -len, newLen, (Math.random() * 20 + 20) * Math.PI / 180, newBranchWidth, currentDepth + 1, maxDepth);
+    drawBranch(0, -len, newLen, -(Math.random() * 20 + 20) * Math.PI / 180, newBranchWidth, currentDepth + 1, maxDepth);
 
-    // 오른쪽 가지
-    const angle1 = (Math.random() * 20 + 20) * Math.PI / 180; // 20-40도
-    drawBranch(0, -len, newLen, angle1, newBranchWidth, currentDepth + 1, maxDepth);
-
-    // 왼쪽 가지
-    const angle2 = -(Math.random() * 20 + 20) * Math.PI / 180; // -20 ~ -40도
-    drawBranch(0, -len, newLen, angle2, newBranchWidth, currentDepth + 1, maxDepth);
-
-    // 잎사귀 (가지 끝에)
     if (len < 15 && currentDepth > 1) {
-        ctx.fillStyle = `rgba(52, 152, 70, ${Math.random() * 0.5 + 0.5})`; // 싱그러운 초록색
+        ctx.fillStyle = `rgba(52, 152, 70, ${Math.random() * 0.5 + 0.5})`;
         ctx.beginPath();
         ctx.arc(0, -len, 7 + Math.random() * 5, 0, Math.PI * 2);
         ctx.fill();
     }
-    
     ctx.restore();
 }
 
-// --- 포인트 및 뷰 관리 ---
-function updatePoints(newPoints) {
-    currentPoints = newPoints;
+// --- UI 및 상태 업데이트 ---
+function updateUI() {
     pointsDisplay.textContent = currentPoints;
-    const growth = Math.floor(currentPoints / 10); // 10포인트당 1 성장
-    drawTree(growth);
+    waterDisplay.textContent = currentWater;
+    drawTree(treeGrowthLevel);
+
+    if (currentWater >= 100) {
+        waterTreeButton.disabled = false;
+    } else {
+        waterTreeButton.disabled = true;
+    }
 }
 
 function showView(viewId) {
-    document.querySelectorAll('.app-view').forEach(view => {
-        view.classList.remove('active');
-    });
+    document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
     document.getElementById(viewId + '-view').classList.add('active');
-
-    document.querySelectorAll('.nav-button').forEach(button => {
-        button.classList.remove('active');
-    });
+    document.querySelectorAll('.nav-button').forEach(button => button.classList.remove('active'));
     document.querySelector(`.nav-button[onclick="showView('${viewId}')"]`).classList.add('active');
 }
 
-
-// --- Data & UI ---
-
-const sampleTransactions = [
-    { item: 'Cafe Latte (Tumbler Discount)', points: 10 },
-    { item: 'Local grocery shopping (used bag)', points: 15 },
-    { item: 'Bus fare', points: 5 },
-    { item: 'Upcycled notebook purchase', points: 25 },
-];
-
+// --- 데이터 ---
 const shopItems = [
     { name: 'Eco-friendly Tumbler', points: 1000, icon: '🥤' },
     { name: 'Upcycled Pouch', points: 1500, icon: '♻️' },
     { name: 'Donate a Tree', points: 2000, icon: '🌳' }
 ];
-
 const sustainabilityTips = [
-    { text: 'Use a tumbler to reduce disposable cups', points: 10 },
+    { text: 'Use a tumbler to reduce disposable cups', points: 10000 },
     { text: 'Use a shopping bag to reduce plastic bags', points: 15 },
     { text: 'Use public transportation', points: 20 }
 ];
 
+// --- 데이터 로딩 및 처리 ---
 function loadTransactions() {
     const transactionList = document.getElementById('transaction-list');
-    transactionList.innerHTML = ''; // Clear list
+    transactionList.innerHTML = '';
     if (sampleTransactions.length === 0) {
         transactionList.innerHTML = '<li>No activity yet.</li>';
-        return;
     }
+
     let totalPoints = 0;
+    let totalWater = 0;
+    sampleTransactions.forEach(t => {
+        if (t.points > 0) {
+            totalWater += t.points;
+        }
+        totalPoints += t.points;
+    });
+    
+    currentPoints = totalPoints;
+    currentWater = totalWater - (treeGrowthLevel / 10);
+
     sampleTransactions.slice().reverse().forEach(t => {
         const li = document.createElement('li');
         const pointColor = t.points > 0 ? 'var(--success-color)' : 'var(--error-color)';
         const sign = t.points > 0 ? '+' : '';
         li.innerHTML = `<span>${t.item}</span><span style="color: ${pointColor}; font-weight: 500;">${sign}${t.points}P</span>`;
         transactionList.appendChild(li);
-        totalPoints += t.points;
     });
-    updatePoints(totalPoints);
+
+    updateUI();
 }
 
 function loadShopItems() {
@@ -149,9 +182,30 @@ function loadShopItems() {
             <div style="font-size: 2rem; margin-bottom: 1rem;">${item.icon}</div>
             <p>${item.name}</p>
             <span>${item.points.toLocaleString()}P</span>
-            <button onclick="redeemItem('${item.name}', ${item.points})">Redeem</button>
+            <button onclick='redeemItem("${item.name}", ${item.points})'>Redeem</button>
         `;
         shopGrid.appendChild(shopCard);
+    });
+}
+
+function loadCoupons() {
+    const couponList = document.getElementById('coupon-list');
+    couponList.innerHTML = '';
+    if (redeemedCoupons.length === 0) {
+        couponList.innerHTML = '<p>You have no coupons yet. Redeem items from the shop!</p>';
+        return;
+    }
+
+    redeemedCoupons.forEach(coupon => {
+        const couponCard = document.createElement('div');
+        couponCard.className = 'coupon-card';
+        couponCard.innerHTML = `
+            <div class="icon">${coupon.icon}</div>
+            <div class="name">${coupon.name}</div>
+            <div class="points">Used ${coupon.points.toLocaleString()}P</div>
+            <div class="redeemed-date">Redeemed on: ${coupon.redeemedDate}</div>
+        `;
+        couponList.appendChild(couponCard);
     });
 }
 
@@ -161,26 +215,50 @@ function loadTips() {
     sustainabilityTips.forEach(tip => {
         const li = document.createElement('li');
         li.dataset.points = tip.points;
-        
         const textSpan = document.createElement('span');
         textSpan.textContent = `${tip.text}`;
-        
         const button = document.createElement('button');
         button.textContent = `Practice (+${tip.points}P)`;
         button.onclick = () => practiceTip(button);
-        
         li.appendChild(textSpan);
         li.appendChild(button);
         tipsList.appendChild(li);
     });
 }
 
+// --- 사용자 액션 ---
+function waterTree() {
+    if (currentWater >= 100) {
+        currentWater -= 100;
+        treeGrowthLevel += 100;
+        showFeedback('Your tree is growing!');
+        updateUI();
+        saveState(); // 상태 저장
+    } else {
+        showFeedback('Not enough water!');
+    }
+}
+
 function redeemItem(name, points) {
     if (currentPoints >= points) {
-        // Add to transactions
-        sampleTransactions.push({ item: `Redeemed: ${name}`, points: -points });
-        loadTransactions();
-        showFeedback(`Redeemed ${name} for ${points}P!`);
+        const itemToRedeem = shopItems.find(item => item.name === name);
+        
+        if (itemToRedeem) {
+            sampleTransactions.push({ item: `Redeemed: ${name}`, points: -points });
+            
+            const newCoupon = {
+                ...itemToRedeem,
+                redeemedDate: new Date().toLocaleDateString()
+            };
+            redeemedCoupons.push(newCoupon);
+
+            loadTransactions();
+            loadCoupons();
+            showFeedback(`Redeemed ${name} for ${points}P!`);
+            saveState(); // 상태 저장
+        } else {
+            showFeedback('Item not found!');
+        }
     } else {
         showFeedback("Not enough points!");
     }
@@ -190,25 +268,12 @@ function practiceTip(button) {
     const li = button.parentElement;
     const points = parseInt(li.dataset.points);
     const text = li.querySelector('span').textContent;
-
-    // Add new transaction
-    const newTransaction = {
-        item: `Practiced: ${text}`,
-        points: points
-    };
-    sampleTransactions.push(newTransaction);
-
-    // Update points and reload transactions
+    sampleTransactions.push({ item: `Practiced: ${text}`, points: points });
     loadTransactions();
-
-    // Visual feedback
-    showFeedback(`+${points}P Earned!`);
-
-    // Disable button to prevent re-clicking
+    showFeedback(`+${points}P Earned! You also got ${points} water.`);
     button.disabled = true;
     button.textContent = 'Done';
-    button.style.backgroundColor = '#ccc';
-    button.style.cursor = 'not-allowed';
+    saveState(); // 상태 저장
 }
 
 function showFeedback(message) {
@@ -216,121 +281,130 @@ function showFeedback(message) {
     const feedback = document.createElement('div');
     feedback.className = 'feedback-message';
     feedback.textContent = message;
-    
     feedbackContainer.appendChild(feedback);
-
     setTimeout(() => {
         feedback.style.opacity = '0';
         feedback.remove();
     }, 2500);
 }
 
-
-// --- 친환경 데이터 (서버에서 로드) ---
-let ecoData = { products: [], companies: [] };
-
-async function loadEcoData() {
+// --- QR 코드 및 제품 상세 로직 ---
+let products = [];
+async function loadProducts() {
     try {
-        const response = await fetch('/eco-data');
-        ecoData = await response.json();
-        console.log(`Loaded ${ecoData.products.length} products and ${ecoData.companies.length} companies from server.`);
+        const response = await fetch('products.json');
+        products = await response.json();
     } catch (error) {
-        console.error("Failed to load eco data:", error);
-        alert("Could not load eco data. Please check server status.");
+        console.error('Failed to load products:', error);
     }
 }
 
+const qrModal = document.getElementById('qr-code-modal');
+const openModalButton = document.getElementById('open-qr-modal-button');
+const closeModalButton = document.getElementById('close-modal-button');
+const productModal = document.getElementById('product-details-modal');
+const closeProductModalButton = document.getElementById('close-product-modal-button');
 
-// --- 포인트 계산 알고리즘 (클라이언트 측) ---
-function calculatePoints(item, price) {
-    let points = 0;
-    const isEcoProduct = ecoData.products.some(p => item.includes(p));
-    const isEcoCompany = ecoData.companies.some(c => item.includes(c));
-
-    if (isEcoProduct || isEcoCompany) {
-        points = Math.floor(price * 0.01);
-        if (isEcoProduct) points += 10;
-        if (isEcoCompany) points += 20;
-    }
-    return points;
+function openQrModal() { qrModal.classList.add('active'); }
+function closeQrModal() {
+    qrModal.classList.remove('active');
+    document.getElementById('qr-result').textContent = '';
+    document.getElementById('qr-code-input').value = '';
 }
 
-
-let html5QrCode = null;
-
-// --- QR 코드 스캐너 관리 ---
-function startScanner() {
-    showView('scanner');
-    if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("qr-reader");
-    }
-    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-    html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
-        .catch(err => {
-            console.error(`Could not start QR scanner.`, err);
-            alert("Could not find camera or permission denied. Please refresh or check browser settings.");
-        });
+function openProductModal(product) {
+    document.getElementById('product-image').src = product.image;
+    document.getElementById('product-name').textContent = product.productName;
+    document.getElementById('product-description').textContent = product.description;
+    document.getElementById('product-pros').textContent = product.pros;
+    document.getElementById('product-cons').textContent = product.cons;
+    productModal.classList.add('active');
 }
 
-function stopScanner() {
-    if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().then(() => {
-            showView('dashboard');
-        }).catch(err => {
-            console.error("Failed to stop QR scanner.", err);
-        });
-    }
+function closeProductModal() {
+    productModal.classList.remove('active');
 }
 
-function onScanSuccess(decodedText, decodedResult) {
-    stopScanner();
-    try {
-        const data = JSON.parse(decodedText);
-        if (data.item) {
-            if (data.price) {
-                processPurchase(data.item, data.price);
-            } else {
-                const priceInput = prompt(`Enter price for '${data.item}':`);
-                if (priceInput) {
-                    const price = parseFloat(priceInput);
-                    if (!isNaN(price) && price > 0) {
-                        processPurchase(data.item, price);
-                    } else {
-                        alert("Invalid price entered.");
-                    }
-                }
-            }
-        } else {
-            alert("Invalid QR code format: 'item' is missing.");
-        }
-    } catch (e) {
-        console.error("Error processing QR code data:", e);
-        alert("Invalid QR code data.");
-    }
-}
+openModalButton.addEventListener('click', openQrModal);
+closeModalButton.addEventListener('click', closeQrModal);
+qrModal.addEventListener('click', (event) => {
+    if (event.target === qrModal) closeQrModal();
+});
 
-function processPurchase(item, price) {
-    const points = calculatePoints(item, price);
-    if (points > 0) {
-        sampleTransactions.push({ item: `QR Scan: ${item}`, points: points });
+closeProductModalButton.addEventListener('click', closeProductModal);
+productModal.addEventListener('click', (event) => {
+    if (event.target === productModal) closeProductModal();
+});
+
+document.getElementById('qr-submit-button').addEventListener('click', () => {
+    const qrCodeInput = document.getElementById('qr-code-input').value;
+    const resultElement = document.getElementById('qr-result');
+    if (!qrCodeInput) {
+        resultElement.textContent = 'Please enter a QR code.';
+        return;
+    }
+    const product = products.find(p => p.qrCode === qrCodeInput);
+    if (product) {
+        const points = product.score;
+        sampleTransactions.push({ item: `QR Scan: ${product.productName}`, points: points });
         loadTransactions();
-        showFeedback(`Congratulations! You earned ${points}P for your eco-friendly purchase.`);
+        showFeedback(`+${points}P for ${product.productName}! You also got ${points} water.`);
+        resultElement.textContent = `Found: ${product.productName}, Score: ${points}`;
+        saveState();
+        setTimeout(() => {
+            closeQrModal();
+            openProductModal(product);
+        }, 1000);
     } else {
-        showFeedback('This product is not eligible for points.');
+        resultElement.textContent = 'Product not found.';
+        showFeedback('This QR code is not valid.');
     }
-}
+    document.getElementById('qr-code-input').value = '';
+});
 
-function onScanFailure(error) {
-    // Ignore scan failure (it happens continuously).
-}
+// 별점 평가 로직
+const stars = document.querySelectorAll('.stars span');
+stars.forEach(star => {
+    star.addEventListener('click', () => {
+        const rating = star.dataset.value;
+        showFeedback(`You rated this product ${rating} stars. Thank you!`);
+        // 여기에 평점 데이터를 서버로 보내는 로직을 추가할 수 있습니다.
+        setTimeout(closeProductModal, 1500);
+    });
+
+    star.addEventListener('mouseover', () => {
+        stars.forEach(s => s.classList.remove('active'));
+        for (let i = 0; i < star.dataset.value; i++) {
+            stars[i].classList.add('active');
+        }
+    });
+
+    star.addEventListener('mouseout', () => {
+        stars.forEach(s => s.classList.remove('active'));
+    });
+});
+
 
 // --- 초기화 ---
 window.onload = () => {
+    loadState(); // 저장된 상태 불러오기
     showView('dashboard');
     loadTransactions();
-    loadEcoData();
     loadShopItems();
     loadTips();
+    loadProducts();
+    loadCoupons();
+    waterTreeButton.addEventListener('click', waterTree);
 };
 
+// --- 개발자용 리셋 기능 ---
+function resetState() {
+    localStorage.removeItem('greenTreeAppState');
+    location.reload();
+}
+
+document.getElementById('dev-reset-button').addEventListener('click', () => {
+    if (confirm('WARNING: This will reset all your points, water, and coupons. Are you sure?')) {
+        resetState();
+    }
+});

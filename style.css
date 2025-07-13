@@ -348,3 +348,250 @@ body {
         font-size: 0.8rem;
     }
 }
+
+/* Header Button */
+.header-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+}
+
+.header-button:hover {
+    background-color: #0056b3;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s;
+}
+
+.modal-overlay.active {
+    display: flex; /* Shown when active */
+}
+
+.modal-content {
+    background-color: var(--background-color);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 450px;
+    position: relative;
+    text-align: center;
+}
+
+.close-modal-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    color: #999;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-content h2 {
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.qr-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.qr-input-container input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.qr-input-container button {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+}
+
+.qr-input-container button:hover {
+    background-color: #0056b3;
+}
+
+#qr-result {
+    margin-top: 1rem;
+    min-height: 1.2em;
+    font-weight: 500;
+}
+
+/* Tree Controls */
+.tree-controls {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.water-display {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.water-button {
+    background-color: #3498db; /* Water-like color */
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+}
+
+.water-button:hover {
+    background-color: #2980b9;
+}
+
+.water-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Coupon Grid */
+.coupon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.coupon-card {
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.coupon-card .icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.coupon-card .name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.coupon-card .points {
+    color: #888;
+    margin-bottom: 1rem;
+}
+
+.coupon-card .redeemed-date {
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+/* Product Details Modal */
+.product-modal {
+    text-align: left;
+    max-width: 500px;
+}
+
+.product-modal img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+}
+
+.product-modal h2 {
+    text-align: center;
+}
+
+.product-info-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.product-info-section h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.product-info-section p {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Star Rating */
+.rating-section {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.stars {
+    cursor: pointer;
+    font-size: 2.5rem;
+    color: #ccc;
+}
+
+.stars span:hover,
+.stars span.active {
+    color: #f8d64e; /* Gold color for stars */
+}
+
+/* Dev Button */
+.dev-button {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background-color: var(--error-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0.7;
+    z-index: 2000;
+}
+
+.dev-button:hover {
+    opacity: 1;
+}

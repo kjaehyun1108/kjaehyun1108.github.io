@@ -15,6 +15,7 @@
         <div class="logo">GreenBag</div>
         <div class="user-profile">
             <div class="points">GP <span id="points-display">0</span></div>
+            <button id="open-qr-modal-button" class="header-button">코드 입력</button>
             <button id="logout-button" class="logout-button">Log Out</button>
         </div>
     </header>
@@ -24,14 +25,19 @@
             <button class="nav-button active" onclick="showView('dashboard')">Dashboard</button>
             <button class="nav-button" onclick="showView('transactions')">Activity</button>
             <button class="nav-button" onclick="showView('shop')">Redeem</button>
+            <button class="nav-button" onclick="showView('coupons')">My Coupons</button>
             <button class="nav-button" onclick="showView('tips')">Tips</button>
-            <button class="nav-button" onclick="showView('qr-scanner')">Scan QR</button>
+            <button class="nav-button" onclick="window.open('https://f331e229-de25-47cb-9840-789850a5992e-00-1u3woucvj9zby.pike.replit.dev', '_blank')">Scan QR</button>
         </nav>
 
         <div id="dashboard-view" class="app-view active">
             <div class="tree-container-wrapper card">
                  <canvas id="tree-canvas" width="300" height="400"></canvas>
-                 <p style="margin-top: 1rem; color: #666;">Your tree grows as you make sustainable choices.</p>
+                 <div class="tree-controls">
+                     <div class="water-display">💧 Water: <span id="water-display">0</span></div>
+                     <button id="water-tree-button" class="water-button">Water Tree (-100)</button>
+                 </div>
+                 <p style="margin-top: 1rem; color: #666;">Use water to grow your tree.</p>
             </div>
         </div>
 
@@ -45,27 +51,56 @@
             <div id="shop-items" class="shop-grid"></div>
         </div>
 
+        <div id="coupons-view" class="app-view">
+            <h2>My Coupons</h2>
+            <div id="coupon-list" class="coupon-grid"></div>
+        </div>
+
         <div id="tips-view" class="app-view list-view card">
             <h2>Sustainability Tips</h2>
             <ul id="tips-list"></ul>
         </div>
+    </main>
 
-        <div id="qr-scanner-view" class="app-view card" style="height: 80vh;">
-            <iframe src="https://f331e229-de25-47cb-9840-789850a5992e-00-1u3woucvj9zby.pike.replit.dev" style="width: 100%; height: 100%; border: none;"></iframe>
-        </div>
-
-        <div id="scanner-view" class="app-view card">
-            <div id="qr-reader-container">
-                <h2>Scan a Product QR Code</h2>
-                <div id="qr-reader"></div>
-                <button onclick="stopScanner()" class="auth-button" style="width: 100%;">Cancel</button>
+    <div id="qr-code-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="close-modal-button" class="close-modal-button">&times;</button>
+            <h2>Enter Product Code</h2>
+            <div class="qr-input-container">
+                <input type="text" id="qr-code-input" placeholder="Enter QR Code">
+                <button id="qr-submit-button">Submit</button>
+                <p id="qr-result"></p>
             </div>
         </div>
-    </main>
+    </div>
+
+    <div id="product-details-modal" class="modal-overlay">
+        <div class="modal-content product-modal">
+            <button id="close-product-modal-button" class="close-modal-button">&times;</button>
+            <img id="product-image" src="" alt="Product Image">
+            <h2 id="product-name"></h2>
+            <p id="product-description"></p>
+            <div class="product-info-section">
+                <h3>Pros</h3>
+                <p id="product-pros"></p>
+            </div>
+            <div class="product-info-section">
+                <h3>Cons</h3>
+                <p id="product-cons"></p>
+            </div>
+            <div class="rating-section">
+                <h3>Rate this product</h3>
+                <div class="stars" id="product-rating-stars">
+                    <span data-value="1">☆</span><span data-value="2">☆</span><span data-value="3">☆</span><span data-value="4">☆</span><span data-value="5">☆</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="feedback-container" class="feedback-container"></div>
 
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <button id="dev-reset-button" class="dev-button">Dev Reset</button>
+
     <script src="app.js"></script>
 </body>
 </html>
